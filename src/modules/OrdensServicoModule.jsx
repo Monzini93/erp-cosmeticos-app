@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../firebaseConfig';
 import { collection, query, onSnapshot, addDoc, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { PlusCircle } from '../components/Icons';
+import jsPDF from 'jspdf';
 
 // Util: formatar datas que podem vir como Timestamp, Date ou undefined
 const formatDate = (value) => {
@@ -35,10 +36,8 @@ function OrdemServicoFormModal({ onClose }) {
     setIngredientes(novos);
   };
 
-  const generatePDF = async (ordemData) => {
-    const { default: jsPDF } = await import('jspdf');
+  const generatePDF = (ordemData) => {
     const docPdf = new jsPDF();
-
     const dataDoc = ordemData.createdAt?.seconds ? new Date(ordemData.createdAt.seconds * 1000) : new Date();
 
     docPdf.setFontSize(18);
@@ -79,7 +78,7 @@ function OrdemServicoFormModal({ onClose }) {
     await Promise.all(updates);
 
     const savedOrdem = { ...ordemData, createdAt: { seconds: Math.floor(Date.now() / 1000) } };
-    await generatePDF(savedOrdem);
+    generatePDF(savedOrdem);
     onClose();
   };
 
